@@ -1,0 +1,41 @@
+import random
+import time
+
+def generate_next_color():
+    colors=["red","blue","green","yellow"]
+    return random.choice(colors)
+
+def user_sequence(length):
+    print(f"Enter the next color of {length}colors, but separate with a space.")
+    user_input=input(">").strip().lower()
+    return user_input.split()
+
+def simon_says_game():
+    print("Welcome to Simon Says!!!")
+    sequence=[]
+    round_number=1
+
+    while True:
+        next_color=generate_next_color()
+        sequence.append(next_color)
+
+        print(f"Round {round_number}. WATCH CAREFULLY!!!!")
+
+        for color in sequence:
+            print(color)
+            time.sleep(1)
+
+        get_user=user_sequence(round_number)
+
+        if get_user != sequence:
+            break
+
+        print(f"Correct! Now onto round {round_number+1}")
+        round_number += 1
+        time.sleep(2)
+
+    print(f"Game Over: Round {round_number}")
+
+if __name__ == "__main__":
+    simon_says_game()
+
