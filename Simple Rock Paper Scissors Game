@@ -1,36 +1,36 @@
 import random
 
 def computer():
-    #Computer will randomly choose rock paper or scissors
-    options=["rock","paper","scissors"]
+    # Computer will randomly choose rock, paper, or scissors
+    options = ["rock", "paper", "scissors"]
     return random.choice(options)
 
 def user_input():
-    players_input=input("Please choose and option: rock,paper,or scissors: ").strip().lower()
-    if players_input not in ['rock', 'paper', 'scissors']:
-        print("That is not an option.Please choose again!!!")
-        players_input = input("Please Choose an option: rock,paper,scissors: ").strip().lower()
+    players_input = input("Please choose an option: rock, paper, or scissors: ").strip().lower()
+    while players_input not in ['rock', 'paper', 'scissors']:
+        print("That is not an option. Please choose again!")
+        players_input = input("Please choose an option: rock, paper, or scissors: ").strip().lower()
     return players_input
 
-def winner(player,computerbot):
-    if player==computerbot:
+def winner(player, computerbot):
+    if player == computerbot:
         return "The game is a TIE!!!"
-
-    if ((player=="paper" and computerbot=="rock") or (player=="rock" and computerbot=="scissors") or (player=="scissors" and computerbot=="paper")):
-        return "You Winn the Game!!!"
+    if ((player == "paper" and computerbot == "rock") or
+        (player == "rock" and computerbot == "scissors") or
+        (player == "scissors" and computerbot == "paper")):
+        return "You Win the Game!!!"
     else:
-        return "Computer Wins :( "
+        return "Computer Wins :("
 
 def rockpaperscissors():
+    player = user_input()
+    computerbot = computer()
 
-    player=user_input()
-    computerbot=computer()
+    print(f"\nYou, the Player, chose: {player}")
+    print(f"The Computer Bot chose: {computerbot}\n")
 
-    print(f"You the Player chose {user_input()}")
-    print(f"The Computer Bot chose {computer()}")
-
-    outcome= winner(player,computerbot)
+    outcome = winner(player, computerbot)
     print(outcome)
 
-if __name__ == "__main__":
- rockpaperscissors()
+
+rockpaperscissors()
