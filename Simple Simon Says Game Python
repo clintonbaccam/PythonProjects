@@ -36,6 +36,5 @@ def simon_says_game():
 
     print(f"Game Over: Round {round_number}")
 
-if __name__ == "__main__":
-    simon_says_game()
+simon_says_game()
 
