@@ -1,0 +1,96 @@
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+
+class SpotifyClient:
+
+    def __init__(self, client_id, client_secret, redirect_uri):
+        self.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
+            client_id=client_id,
+            client_secret=client_secret,
+            redirect_uri=redirect_uri,
+            scope="playlist-modify-public user-top-read"
+        ))
+        '''
+        first i made a class called spotifyclient. Above this code basically makes
+        instances of each parameter that will be used. First you need to get your API
+        from a new app from the Spotify API. The scope allows you to change public 
+        playlists. 
+        '''
+
+    def song_search(self, song_name):
+        results = self.sp.search(q=song_name, type='track', limit=1) #This finds the song name,artist, and only limits to one search at a time
+        tracks = results['tracks']['items']
+        if tracks:
+            return tracks[0]    #lines 23-26 essentially means that if the track
+                                #is found return it if not return nothing.
+        else:
+            return None
+
+
+    def create_playlist(self, user_id, playlist_name, description=""):
+        playlist = self.sp.user_playlist_create(user=user_id, name=playlist_name, public=True, description=description)
+        return playlist['id']
+
+    def add_song_to_playlist(self, playlist_id, song_id):
+        self.sp.playlist_add_items(playlist_id, [song_id])
+
+    def get_top_artists(self,limit=50):
+        top_artists=self.sp.current_user_top_artists(limit=limit)
+        return top_artists['items']
+
+
+class UserPlaylist:
+    def __init__(self, spotify_client, user_id):
+        self.spotify_client = spotify_client
+        self.user_id = user_id
+        self.playlist_id = None
+
+    def create_playlist(self, name, description=""):
+        self.playlist_id = self.spotify_client.create_playlist(self.user_id, name, description)
+        print(f"Playlist '{name}' was created")
+
+    def add_song(self, song_name):
+        song = self.spotify_client.song_search(song_name)
+        if song:
+            self.spotify_client.add_song_to_playlist(self.playlist_id, song['id'])
+            print(f"Added {song['name']} by {song['artists'][0]['name']} to the playlist")
+        else:
+            print(f"Song {song_name} was not found in the system")
+
+def main():
+    client_id = "Your client_id"                       # https://developer.spotify.com/dashboard go to this website
+    client_secret = "Your client_secreet"              #https://developer.spotify.com/dashboard
+    redirect_uri = "http://localhost:8888/callback"    # I used this uri for our own local computer. 
+
+    # Initialize the Spotify client
+    spotify_client = SpotifyClient(client_id, client_secret, redirect_uri)
+
+    # Get the current user's ID
+    user_id = spotify_client.sp.current_user()['id']
+
+    # Initialize the playlist manager
+    manager = UserPlaylist(spotify_client, user_id)
+
+    #Get the top 50 artists
+    top_artists = spotify_client.get_top_artists()
+    print("\nHere are your top 10 Artists: ")
+    for i, artist in enumerate(top_artists, 1):
+        print(f"{i}. {artist['name']}")
+
+    # Create a playlist
+    playlist_name = input("Enter playlist name: ")
+    playlist_description = input("Enter playlist description: ")
+    manager.create_playlist(playlist_name, playlist_description)
+
+    #Enter the song for your playlist
+    while True:
+        song_name = input("Enter a song name to add to the playlist (or type 'done' to finish): ")
+        if song_name.lower() == 'done':
+            break
+        manager.add_song(song_name)
+
+    print("Playlist creation complete.")
+
+
+if __name__ == "__main__":
+    main()
