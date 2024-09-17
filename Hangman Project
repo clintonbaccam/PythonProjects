@@ -1,0 +1,128 @@
+//I did get the hangman display from another account:
+//https://gist.github.com/chrishorton/8510732aa9a80a03c829b09f12e20d9c
+
+
+import random
+
+
+def get_word():
+    
+        word_list = ['Hello','Goose','Ribosome','Dracula','Blanket','Caramel', 'Blood', 'Bright','Lagoon','Beetle','Scream']
+        word= random.choice(word_list)
+
+        return word.upper()
+
+def play_game(word):
+        incomeplete_word = "_"*len(word)
+        guessed= False
+        guessed_letters=[]
+        guessed_words=[]
+        tries=6
+        
+        print("Welcome to Hangman!!!")
+        print(hangman_display(tries))
+        print(incomeplete_word)
+        print('\n')
+
+        while not guessed and tries >0:
+            guess = input("Please guess a letter or word: ").upper()
+            if len(guess) == 1 and guess.isalpha():
+                if guess in guessed_letters:
+                     print(f"You've already guessed the leter {guess}")
+                elif guess not in word:
+                    print(f"The word does NOT contain your letter {guess}")
+                    tries-=1
+                    guessed_letters.append(guess)
+                else:
+                    print("The letter is in the Word!!!")
+                    for i in range(len(word)):
+                         if word[i] == guess:
+                            incomeplete_word= incomeplete_word[:i] + guess + incomeplete_word[i+1:]
+                    if '_' not in incomeplete_word:
+                         guessed=True;
+                
+                   
+            elif len(guess)== len(word) and guess.isalpha():
+                if guess in guessed_words:
+                      print("This word has already been used!!!")
+                elif guess != word:
+                     print("This is NOT the Word!!!")
+                     tries -=1
+                else:
+                     guessed=True
+                     incomeplete_word=word
+                
+                   
+            else:
+                print("This is not a Valid Guess!!!!")
+            
+            print(hangman_display(tries))
+            print(incomeplete_word)
+            print('\n')
+
+        if guessed:
+             print("CONGRATUALTIONS!!!! YOU WON THE GAME!!!")
+        else:
+             print(f"You ran out of tries and lost the game. The word was {word} :(")
+
+
+
+
+
+
+def hangman_display(tries):
+        display = ['''
+  +---+
+  |   |
+  O   |
+ /|\  |
+ / \  |
+      |
+=========''', '''
+  +---+
+  |   |
+  O   |
+ /|\  |
+ /    |
+      |
+=========''', '''
+  +---+
+  |   |
+  O   |
+ /|\  |
+      |
+      |
+=========''', '''
+  +---+
+  |   |
+  O   |
+ /|   |
+      |
+      |
+=========''', '''
+  +---+
+  |   |
+  O   |
+  |   |
+      |
+      |
+=========''', '''
+  +---+
+  |   |
+  O   |
+      |
+      |
+      |
+=========''', '''
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========''']
+        return display[tries]
+
+
+word = get_word()
+play_game(word)
