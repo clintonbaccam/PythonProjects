@@ -1,0 +1,157 @@
+# This bank system uses json to create and store a file. The os helps determine if the file exists
+
+
+
+import re
+import os
+import json
+
+
+class BankSystem():
+    DATA_FILE = 'accounts.json'
+    
+    def __init__(self) -> None:
+        self.accounts=self.load_accounts()
+        self.balance=0.0
+        self.current_user=None
+
+    
+    def load_accounts(self):
+        if os.path.exists(self.DATA_FILE):
+            with open (self.DATA_FILE,'r') as file:
+                return json.load(file)
+        else:
+            return{}
+        
+    
+    def save_accounts(self):
+        with open(self.DATA_FILE,'w') as file:
+            json.dump(self.accounts,file)
+
+    def validate_password(self,password):
+        if len(password)<8:
+            print("The password must be at least 8 characters long.")
+            return False
+        if not re.search(r'[A-Za-z]',password):
+            print("The password must contain at least one letter.")
+            return False
+        if not re.search(r'[0-9]',password):
+            print("The password must contain at least one number.")
+            return False
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]',password):
+            print("The password must contain at least one special character.")
+            return False
+        return True
+    
+    def create_account(self,username):
+        if username in self.accounts:
+            print("This username has already been taken.")
+            return False
+        
+        while True:
+            password = input("Enter a password: ")
+            if self.validate_password(password):
+                break
+
+        self.accounts[username]={
+            'password': password,
+            'balance': 0.0
+        }
+        
+        self.save_accounts()
+        print(f"Account created successfully for {username}")
+    
+    def sign_in(self,username,password):
+        if username not in self.accounts:
+            print("This user doesn't exist")
+            return False
+        if self.accounts[username]['password']==password:
+            self.current_user=username
+            self.balance=self.accounts[username]['balance']
+            print("Welcome Back!!")
+            return True
+        else:
+            print("invalid password.")
+            return False                         
+
+
+
+    def deposit(self,amount):
+        if amount>0:
+            self.balance += amount
+            self.accounts[self.current_user]['balance']=self.balance
+            self.save_accounts()
+            print(f"${amount} was deposited to {self.current_user}'s account.")
+        else:
+            print("Deposit amount must be positve or above zero. ")
+            return
+
+        
+
+    def withdraw(self,amount):
+        if self.balance>=amount:
+            self.balance -= amount
+            self.accounts[self.current_user]['balance']=self.balance
+            self.save_accounts()
+            print(f"${amount} withdrawn from {self.current_user}'s account. You have {self.balance} left")
+        
+        elif amount <=0:
+            print("Deposit amount must be positive.")
+            return
+
+    
+    def check_balance(self):
+        print(f"{self.current_user} has ${self.balance} in the account")
+    
+    def log_out(self):
+        print(f"Logging out {self.current_user}")
+        self.current_user=None
+        self.balance=0.0
+
+def run(banksystem):
+    while True: 
+         print("\n1. Create Account\n2. Sign In\n3. Exit")
+         choice = input("Please select an option you'd like to do: ")
+
+         if choice =='1':
+             username=input("Enter a username: ")
+             banksystem.create_account(username)
+        
+         elif choice == "2":
+             username=input("Enter username: ")
+             password=input("Enter password: ")
+             if banksystem.sign_in(username,password):
+                 while True:
+                     print("\n1.Deposit\n2.Withdraw\n3.Check Balance\n4.Log Out")
+                     user_choice=input("Please select an option: ")
+                     if user_choice=="1":
+                         try:
+                            amount=float(input("Enter amount to deposit: "))
+                            banksystem.deposit(amount)
+                         except ValueError:
+                             print("please enter a valid amount.")
+                     elif user_choice =="2":
+                         try:
+                            amount = float(input("Enter amount to withdraw: "))
+                            banksystem.withdraw(amount)
+                         except ValueError:
+                             print("Please enter a valid amount.")
+                     elif user_choice=="3":
+                         banksystem.check_balance()
+                     elif user_choice =="4":
+                         banksystem.log_out()
+                         break
+         elif choice == "3":
+             print("Exiting the bank")
+             break
+         else: 
+             print("invalid option, please try again!!!")
+
+
+
+if __name__ == "__main__":
+    bank=BankSystem()
+    run(bank)
+
+
+
