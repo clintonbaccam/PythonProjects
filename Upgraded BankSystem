@@ -76,28 +76,32 @@ class BankSystem():
 
 
 
-    def deposit(self,amount):
-        if amount>0:
-            self.balance += amount
-            self.accounts[self.current_user]['balance']=self.balance
-            self.save_accounts()
-            print(f"${amount} was deposited to {self.current_user}'s account.")
-        else:
-            print("Deposit amount must be positve or above zero. ")
-            return
-
-        
-
-    def withdraw(self,amount):
-        if self.balance>=amount:
-            self.balance -= amount
-            self.accounts[self.current_user]['balance']=self.balance
-            self.save_accounts()
-            print(f"${amount} withdrawn from {self.current_user}'s account. You have {self.balance} left")
-        
-        elif amount <=0:
+    def deposit(self, amount):
+        if amount <= 0:
             print("Deposit amount must be positive.")
             return
+        
+        self.balance += amount
+        self.accounts[self.current_user]['balance'] = self.balance
+        self.save_accounts()
+        print(f"${amount} was deposited to {self.current_user}'s account.")
+
+    def withdraw(self, amount):
+        if amount <= 0:
+            print("Withdrawal amount must be positive.")
+            return
+        
+        if self.balance == 0:
+            print("Your account balance is zero. You cannot withdraw anything.")
+            return
+        
+        if self.balance >= amount:
+            self.balance -= amount
+            self.accounts[self.current_user]['balance'] = self.balance
+            self.save_accounts()
+            print(f"${amount} withdrawn from {self.current_user}'s account. You have ${self.balance} left.")
+        else:
+            print("Insufficient balance.")
 
     
     def check_balance(self):
@@ -152,6 +156,8 @@ def run(banksystem):
 if __name__ == "__main__":
     bank=BankSystem()
     run(bank)
+
+
 
 
 
